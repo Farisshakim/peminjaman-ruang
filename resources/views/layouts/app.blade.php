@@ -22,7 +22,7 @@
         header {
             background: #173b57;
             color: white;
-            padding: 18px 24px;
+            padding: 12px 24px;
         }
 
         .header-content {
@@ -35,11 +35,50 @@
             flex-wrap: wrap;
         }
 
+        .brand-group {
+            display: flex;
+            flex-direction: column;
+        }
+
         .brand {
             font-size: 22px;
             font-weight: bold;
             text-decoration: none;
             color: white;
+            line-height: 1.2;
+        }
+
+        .brand-subtitle {
+            font-size: 11px;
+            color: #d2e3f0;
+            margin-top: 2px;
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            color: #d2e3f0;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 8px 14px;
+            border-radius: 6px;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .nav-btn:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .nav-btn.active {
+            background: #176b9a;
+            color: #ffffff;
         }
 
         main {
@@ -76,17 +115,27 @@
             font-weight: bold;
         }
 
-        input {
+        input, select, textarea {
             width: 100%;
             padding: 12px;
             border: 1px solid #bfcbd9;
             border-radius: 8px;
             font: inherit;
+            background: white;
+            box-sizing: border-box;
         }
 
-        input:focus {
+        input:focus, select:focus, textarea:focus {
             outline: 2px solid #287bb5;
             outline-offset: 2px;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        textarea {
+            resize: vertical;
         }
 
         button {
@@ -159,107 +208,240 @@
         }
 
         .toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-}
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
 
-.toolbar h1 {
-    margin-bottom: 0;
-}
+        .toolbar h1 {
+            margin-bottom: 0;
+        }
 
-.btn {
-    display: inline-block;
-    padding: 10px 16px;
-    border: 0;
-    border-radius: 8px;
-    background: #176b9a;
-    color: white;
-    text-decoration: none;
-    font: inherit;
-    font-weight: bold;
-    cursor: pointer;
-}
+        .btn {
+            display: inline-block;
+            padding: 10px 16px;
+            border: 0;
+            border-radius: 8px;
+            background: #176b9a;
+            color: white;
+            text-decoration: none;
+            font: inherit;
+            font-weight: bold;
+            cursor: pointer;
+        }
 
-.btn-secondary {
-    background: #e8eef5;
-    color: #203047;
-}
+        .btn-secondary {
+            background: #e8eef5;
+            color: #203047;
+        }
 
-.btn-danger {
-    background: #b42332;
-    color: white;
-}
+        .btn-danger {
+            background: #b42332;
+            color: white;
+        }
 
-.actions {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    flex-wrap: wrap;
-}
+        .actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
 
-.actions form {
-    margin: 0;
-}
+        .actions form {
+            margin: 0;
+        }
 
-.table-wrapper {
-    overflow-x: auto;
-}
+        .table-wrapper {
+            overflow-x: auto;
+        }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
 
-th,
-td {
-    padding: 14px 12px;
-    text-align: left;
-    border-bottom: 1px solid #e1e7ef;
-    vertical-align: middle;
-}
+        th,
+        td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e1e7ef;
+            vertical-align: middle;
+        }
 
-th {
-    background: #f5f8fc;
-    font-size: 14px;
-}
+        th {
+            background: #f5f8fc;
+            font-size: 14px;
+        }
 
-.form-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 24px;
-    flex-wrap: wrap;
-}
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
 
-.pagination {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-top: 20px;
-}
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
 
-.form-error {
-    color: #a32323;
-    display: block;
-    margin-top: 6px;
-}
+        @media (max-width: 640px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .photo-preview {
+            width: 140px;
+            height: 95px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #e1e7ef;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .form-error {
+            color: #a32323;
+            display: block;
+            margin-top: 6px;
+        }
+
+        .room-photo {
+            width: 80px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #e1e7ef;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .room-photo-placeholder {
+            width: 80px;
+            height: 60px;
+            background: #f0f3f6;
+            border-radius: 6px;
+            border: 1px solid #e1e7ef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: #607086;
+            margin-bottom: 6px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .status-active, .status-disetujui {
+            background: #e8f7ef;
+            color: #17633e;
+        }
+
+        .status-inactive, .status-ditolak {
+            background: #fff0f0;
+            color: #a32323;
+        }
+
+        .status-menunggu {
+            background: #fff8e5;
+            color: #8a5800;
+        }
+
+        .status-dibatalkan {
+            background: #f1f3f6;
+            color: #475467;
+        }
+
+        .status-selesai {
+            background: #eef4ff;
+            color: #175cd3;
+        }
     </style>
 </head>
 <body>
     <header>
         <div class="header-content">
-            <a class="brand"
-               href="{{ auth()->check() ? route('dashboard') : route('login') }}">
-                SIPERU
-            </a>
+            <div class="brand-group">
+                <a class="brand"
+                   href="{{ auth()->check() ? route('dashboard') : route('login') }}">
+                    SIPERU
+                </a>
+                <span class="brand-subtitle">Sistem Informasi Peminjaman Ruang</span>
+            </div>
 
             @auth
-                <form method="POST" action="{{ route('logout') }}">
+                @if (auth()->user()->role === 'admin')
+                    <nav class="nav-menu">
+                        <a href="{{ route('admin.dashboard') }}"
+                           class="nav-btn {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                            Dashboard
+                        </a>
+                        <a href="{{ route('admin.rooms.index') }}"
+                           class="nav-btn {{ request()->routeIs('admin.rooms.*') ? 'active' : '' }}">
+                            Kelola Ruang
+                        </a>
+                        <a href="{{ route('admin.facilities.index') }}"
+                           class="nav-btn {{ request()->routeIs('admin.facilities.*') ? 'active' : '' }}">
+                            Kelola Fasilitas
+                        </a>
+                        <a href="{{ route('admin.users.index') }}"
+                           class="nav-btn {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                            Kelola Akun
+                        </a>
+                        <a href="{{ route('admin.reports.index') }}"
+                           class="nav-btn {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
+                            Laporan
+                        </a>
+                    </nav>
+                @elseif (auth()->user()->role === 'mahasiswa')
+                    <nav class="nav-menu">
+                        <a href="{{ route('mahasiswa.dashboard') }}"
+                           class="nav-btn {{ request()->routeIs('mahasiswa.dashboard') ? 'active' : '' }}">
+                            Dashboard
+                        </a>
+                        <a href="{{ route('mahasiswa.rooms.index') }}"
+                           class="nav-btn {{ request()->routeIs('mahasiswa.rooms.*') ? 'active' : '' }}">
+                            Cari Ruang
+                        </a>
+                        <a href="{{ route('mahasiswa.bookings.index') }}"
+                           class="nav-btn {{ request()->routeIs('mahasiswa.bookings.*') ? 'active' : '' }}">
+                            Peminjaman Saya
+                        </a>
+                    </nav>
+                @elseif (auth()->user()->role === 'petugas')
+                    <nav class="nav-menu">
+                        <a href="{{ route('petugas.dashboard') }}"
+                           class="nav-btn {{ request()->routeIs('petugas.dashboard') ? 'active' : '' }}">
+                            Dashboard
+                        </a>
+                        <a href="{{ route('petugas.bookings.index') }}"
+                           class="nav-btn {{ request()->routeIs('petugas.bookings.*') ? 'active' : '' }}">
+                            Kelola Peminjaman
+                        </a>
+                    </nav>
+                @endif
+
+                <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
                     @csrf
                     <button class="logout" type="submit">Keluar</button>
                 </form>

@@ -7,9 +7,14 @@
         <div class="toolbar">
             <h1>Kelola Ruang</h1>
 
-            <a class="btn" href="{{ route('admin.rooms.create') }}">
-                + Tambah Ruang
-            </a>
+            <div class="actions">
+                <a class="btn" href="{{ route('admin.rooms.create') }}">
+                    + Tambah Ruang
+                </a>
+                <a class="btn btn-secondary" href="{{ route('admin.dashboard') }}">
+                    Dashboard
+                </a>
+            </div>
         </div>
 
         <form
@@ -62,8 +67,11 @@
                                         class="room-photo"
                                         src="{{ asset('storage/' . $room->photo) }}"
                                         alt="Foto {{ $room->name }}"
+                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                                     >
-                                    <br>
+                                    <div class="room-photo-placeholder" style="display: none;">Tanpa Foto</div>
+                                @else
+                                    <div class="room-photo-placeholder">Tanpa Foto</div>
                                 @endif
 
                                 <strong>{{ $room->name }}</strong><br>
@@ -151,8 +159,8 @@
         @endif
 
         <div style="margin-top: 24px;">
-            <a href="{{ route('admin.dashboard') }}">
-                Kembali ke dashboard
+            <a class="btn btn-secondary" href="{{ route('admin.dashboard') }}">
+                Kembali ke Dashboard
             </a>
         </div>
     </section>
