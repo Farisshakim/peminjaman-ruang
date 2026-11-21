@@ -51,6 +51,24 @@
                 </small>
             @enderror
 
+            <label for="total_stock">Total stok milik kampus</label>
+
+            <input
+                id="total_stock"
+                name="total_stock"
+                type="number"
+                min="0"
+                max="100000"
+                value="{{ old('total_stock', $facility->total_stock ?? 0) }}"
+                required
+            >
+
+            @error('total_stock')
+                <span class="form-error">{{ $message }}</span>
+            @enderror
+
+            <p class="muted">
+
             <div class="form-actions">
                 <button class="btn" type="submit">
                     {{ $facility->exists ? 'Simpan Perubahan' : 'Simpan Fasilitas' }}
@@ -63,6 +81,5 @@
                     Batal
                 </a>
             </div>
-        </form>
     </section>
 @endsection
