@@ -7,6 +7,8 @@ use App\Models\Facility;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class FacilityController extends Controller
 {
@@ -33,12 +35,22 @@ class FacilityController extends Controller
                 'required',
                 'string',
                 'max:100',
-                'unique:facilities,name',
+                Rule::unique('facilities', 'name'),
+            ],
+            'total_stock' => [
+                'required',
+                'integer',
+                'min:0',
+                'max:100000',
             ],
         ], [
             'name.required' => 'Nama fasilitas wajib diisi.',
-            'name.max' => 'Nama fasilitas maksimal 100 karakter.',
             'name.unique' => 'Nama fasilitas sudah terdaftar.',
+            'name.max' => 'Nama fasilitas maksimal 100 karakter.',
+            'total_stock.required' => 'Total stok wajib diisi.',
+            'total_stock.integer' => 'Total stok harus berupa bilangan bulat.',
+            'total_stock.min' => 'Total stok tidak boleh negatif.',
+            'total_stock.max' => 'Total stok maksimal 100000.',
         ]);
 
         Facility::create($data);
@@ -62,19 +74,48 @@ class FacilityController extends Controller
                 'max:100',
                 Rule::unique('facilities', 'name')->ignore($facility->id),
             ],
+            'total_stock' => [
+                'required',
+                'integer',
+                'min:0',
+                'max:100000',
+            ],
         ], [
             'name.required' => 'Nama fasilitas wajib diisi.',
-            'name.max' => 'Nama fasilitas maksimal 100 karakter.',
             'name.unique' => 'Nama fasilitas sudah terdaftar.',
+            'name.max' => 'Nama fasilitas maksimal 100 karakter.',
+            'total_stock.required' => 'Total stok wajib diisi.',
+            'total_stock.integer' => 'Total stok harus berupa bilangan bulat.',
+            'total_stock.min' => 'Total stok tidak boleh negatif.',
+            'total_stock.max' => 'Total stok maksimal 100000.',
         ]);
 
-        $facility->update($data);
+        DB::transaction(function () use ($facility, $data) {
+            $current = Facility::whereKey($facility->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $allocated = DB::table('room_facilities')
+                ->where('facility_id', $current->id)
+                ->lockForUpdate()
+                ->get()
+                ->sum('quantity');
+
+            if ((int) $data['total_stock'] < $allocated) {
+                throw ValidationException::withMessages([
+                    'total_stock' =>
+                        "Total stok tidak boleh kurang dari {$allocated}, "
+                        .'karena barang tersebut sudah dialokasikan ke ruangan.',
+                ]);
+            }
+
+            $current->update($data);
+        }, 3);
 
         return redirect()
             ->route('admin.facilities.index')
             ->with('success', 'Fasilitas berhasil diperbarui.');
     }
-
     public function destroy(Facility $facility)
     {
         if ($facility->rooms()->exists()) {

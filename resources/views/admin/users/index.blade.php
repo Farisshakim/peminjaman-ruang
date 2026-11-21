@@ -8,7 +8,7 @@
             <h1>Kelola Akun</h1>
 
             <a class="btn" href="{{ route('admin.users.create') }}">
-                + Tambah Akun
+                Tambah Akun
             </a>
         </div>
 
@@ -99,10 +99,5 @@
             </nav>
         @endif
 
-        <div style="margin-top: 24px;">
-            <a href="{{ route('admin.dashboard') }}">
-                Kembali ke dashboard
-            </a>
-        </div>
     </section>
 @endsection

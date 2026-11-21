@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
 use App\Models\Facility;
 use App\Models\Room;
 use Illuminate\Http\Request;
@@ -96,8 +97,8 @@ class RoomController extends Controller
                 'min:0',
                 'max:100000',
             ],
-            'new_facility_name' => ['nullable', 'string', 'max:100'],
-            'new_facility_quantity' => ['nullable', 'integer', 'min:0', 'max:100000'],
+            'new_facility_name' => ['prohibited'],
+            'new_facility_quantity' => ['prohibited'],
         ], [
             'required' => ':attribute wajib diisi.',
             'integer' => ':attribute harus berupa bilangan bulat.',
@@ -140,14 +141,6 @@ class RoomController extends Controller
             }
         }
 
-        if ($request->filled('new_facility_name')) {
-            $newFacName = trim($request->input('new_facility_name'));
-            $newFac = Facility::firstOrCreate(['name' => $newFacName]);
-            $newQty = (int) $request->input('new_facility_quantity', 0);
-            if ($newQty > 0) {
-                $pivotData[$newFac->id] = ['quantity' => $newQty];
-            }
-        }
 
         unset(
             $data['facility_quantities'],
@@ -189,9 +182,120 @@ class RoomController extends Controller
 
                 $oldPhoto = $target->photo;
 
-                $target->fill($data);
-                $target->save();
-                $target->facilities()->sync($pivotData);
+if (! $isNew) {
+    $now = now();
+    $today = $now->toDateString();
+    $currentTime = $now->format('H:i:s');
+
+    // Hanya peminjaman disetujui yang belum berakhir.
+    // Termasuk peminjaman yang sedang berlangsung.
+    $approvedBookings = Booking::where('room_id', $target->id)
+        ->where('status', 'disetujui')
+        ->where(function ($query) use ($today, $currentTime) {
+            $query->where('booking_date', '>', $today)
+                ->orWhere(function ($query) use ($today, $currentTime) {
+                    $query->where('booking_date', $today)
+                        ->where('end_time', '>', $currentTime);
+                });
+        })
+        ->lockForUpdate()
+        ->get();
+
+    if ($approvedBookings->isNotEmpty()) {
+        if (! $data['is_active']) {
+            throw ValidationException::withMessages([
+                'is_active' =>
+                    'Ruang tidak dapat dinonaktifkan karena masih memiliki '
+                    .'peminjaman disetujui yang belum berakhir.',
+            ]);
+        }
+
+        $newOpeningTime = $data['opening_time'].':00';
+        $newClosingTime = $data['closing_time'].':00';
+
+        foreach ($approvedBookings as $booking) {
+            $reference = $booking->booking_code
+                .' tanggal '
+                .$booking->booking_date->format('d-m-Y');
+
+            if ((int) $data['capacity'] < $booking->participant_count) {
+                throw ValidationException::withMessages([
+                    'capacity' =>
+                        'Kapasitas tidak boleh kurang dari '
+                        .$booking->participant_count
+                        .' orang karena ada peminjaman '
+                        .$reference.'.',
+                ]);
+            }
+
+            if ($newOpeningTime > $booking->start_time) {
+                throw ValidationException::withMessages([
+                    'opening_time' =>
+                        'Jam buka tidak boleh melewati '
+                        .substr($booking->start_time, 0, 5)
+                        .' WIB karena ada peminjaman '
+                        .$reference.'.',
+                ]);
+            }
+
+            if ($newClosingTime < $booking->end_time) {
+                throw ValidationException::withMessages([
+                    'closing_time' =>
+                        'Jam tutup tidak boleh sebelum '
+                        .substr($booking->end_time, 0, 5)
+                        .' WIB karena ada peminjaman '
+                        .$reference.'.',
+                ]);
+            }
+        }
+    }
+}
+
+$lockedFacilities = Facility::orderBy('id')
+    ->lockForUpdate()
+    ->get()
+    ->keyBy('id');
+
+$allocations = DB::table('room_facilities')
+    ->orderBy('facility_id')
+    ->orderBy('room_id')
+    ->lockForUpdate()
+    ->get();
+
+foreach ($pivotData as $facilityId => $pivot) {
+    $facility = $lockedFacilities->get($facilityId);
+
+    if (! $facility) {
+        throw ValidationException::withMessages([
+            'facility_quantities' =>
+                'Fasilitas sudah tidak tersedia. Muat ulang halaman.',
+        ]);
+    }
+
+    // Alokasi ruang yang sedang diedit tidak dihitung sebagai
+    // pemakaian ruang lain, karena akan diganti oleh nilai baru.
+    $usedElsewhere = $allocations
+        ->where('facility_id', $facilityId)
+        ->filter(function ($allocation) use ($target) {
+            return ! $target->exists
+                || (int) $allocation->room_id !== (int) $target->id;
+        })
+        ->sum('quantity');
+
+    $maximum = (int) $facility->total_stock - $usedElsewhere;
+
+    if ((int) $pivot['quantity'] > $maximum) {
+        throw ValidationException::withMessages([
+            'facility_quantities.'.$facilityId =>
+                "Stok {$facility->name} tidak cukup. "
+                ."Maksimal untuk ruang ini adalah {$maximum} unit.",
+        ]);
+    }
+}
+
+$target->fill($data);
+$target->save();
+$target->facilities()->sync($pivotData);
             });
         } catch (Throwable $exception) {
             // Hapus foto baru jika penyimpanan database gagal.

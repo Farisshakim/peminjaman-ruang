@@ -3,22 +3,47 @@
 @section('title', 'Kelola Ruang | SIPERU')
 
 @section('content')
+    <style>
+        .filter-form.room-search {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+            margin-bottom: 24px;
+        }
+
+        .filter-form.room-search input[type="search"] {
+            flex: 1 1 260px;
+            width: auto;
+            min-width: 0;
+            margin: 0;
+        }
+
+        .filter-form.room-search .btn {
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 600px) {
+            .filter-form.room-search input[type="search"] {
+                flex-basis: 100%;
+            }
+        }
+    </style>
     <section class="card">
         <div class="toolbar">
             <h1>Kelola Ruang</h1>
 
             <div class="actions">
                 <a class="btn" href="{{ route('admin.rooms.create') }}">
-                    + Tambah Ruang
-                </a>
-                <a class="btn btn-secondary" href="{{ route('admin.dashboard') }}">
-                    Dashboard
+                    Tambah Ruang
                 </a>
             </div>
         </div>
 
         <form
-            class="filter-form"
+            class="filter-form room-search"
             method="GET"
             action="{{ route('admin.rooms.index') }}"
         >
@@ -157,11 +182,5 @@
                 </div>
             </nav>
         @endif
-
-        <div style="margin-top: 24px;">
-            <a class="btn btn-secondary" href="{{ route('admin.dashboard') }}">
-                Kembali ke Dashboard
-            </a>
-        </div>
     </section>
 @endsection

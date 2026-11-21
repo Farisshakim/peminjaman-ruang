@@ -12,6 +12,7 @@ use App\Http\Controllers\Mahasiswa\BookingController as MahasiswaBookingControll
 use App\Http\Controllers\Petugas\BookingController as PetugasBookingController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\DashboardController;
+use App\Models\Booking;
 
 Route::get('/', function () {
     return redirect()->route('login');
