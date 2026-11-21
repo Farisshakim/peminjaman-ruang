@@ -282,7 +282,11 @@
                                 {{ substr($booking->end_time, 0, 5) }}
                             </td>
                             <td>{{ $booking->participant_count }}</td>
-                            <td>{{ ucfirst($booking->status) }}</td>
+                            <td>
+                                <span class="status-badge status-{{ $booking->status }}">
+                                    {{ ucfirst($booking->status) }}
+                                </span>
+                            </td>
                         </tr>
                     @empty
                         <tr>

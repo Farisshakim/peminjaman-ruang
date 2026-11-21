@@ -96,6 +96,8 @@ class RoomController extends Controller
                 'min:0',
                 'max:100000',
             ],
+            'new_facility_name' => ['nullable', 'string', 'max:100'],
+            'new_facility_quantity' => ['nullable', 'integer', 'min:0', 'max:100000'],
         ], [
             'required' => ':attribute wajib diisi.',
             'integer' => ':attribute harus berupa bilangan bulat.',
@@ -112,6 +114,8 @@ class RoomController extends Controller
             'closing_time' => 'Jam tutup',
             'is_active' => 'Status ruang',
             'facility_quantities.*' => 'Jumlah fasilitas',
+            'new_facility_name' => 'Nama fasilitas baru',
+            'new_facility_quantity' => 'Jumlah fasilitas baru',
         ]);
 
         $quantities = $data['facility_quantities'] ?? [];
@@ -136,7 +140,21 @@ class RoomController extends Controller
             }
         }
 
-        unset($data['facility_quantities'], $data['photo']);
+        if ($request->filled('new_facility_name')) {
+            $newFacName = trim($request->input('new_facility_name'));
+            $newFac = Facility::firstOrCreate(['name' => $newFacName]);
+            $newQty = (int) $request->input('new_facility_quantity', 0);
+            if ($newQty > 0) {
+                $pivotData[$newFac->id] = ['quantity' => $newQty];
+            }
+        }
+
+        unset(
+            $data['facility_quantities'],
+            $data['photo'],
+            $data['new_facility_name'],
+            $data['new_facility_quantity']
+        );
         $data['is_active'] = $request->boolean('is_active');
 
         $isNew = ! $room->exists;

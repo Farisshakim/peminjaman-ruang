@@ -36,25 +36,6 @@
         </div>
     </section>
 
-        @if (auth()->user()->role === 'admin')
-            <div class="actions" style="margin-top: 28px;">
-                <a class="btn" href="{{ route('admin.rooms.index') }}">
-                    Kelola Ruang
-                </a>
-
-                <a class="btn" href="{{ route('admin.facilities.index') }}">
-                    Kelola Fasilitas
-                </a>
-
-                <a class="btn" href="{{ route('admin.users.index') }}">
-                    Kelola Akun
-                </a>
-                <a class="btn" href="{{ route('admin.reports.index') }}">
-                    Laporan Peminjaman
-                </a>
-            </div>
-        @endif
-
         @if (auth()->user()->role === 'mahasiswa')
             <div class="actions" style="margin-top: 28px;">
                 <a class="btn" href="{{ route('mahasiswa.rooms.index') }}">
@@ -133,7 +114,11 @@
                             <td>
                                 {{ $booking->booking_date->format('d-m-Y') }}
                             </td>
-                            <td>{{ ucfirst($booking->status) }}</td>
+                            <td>
+                                <span class="status-badge status-{{ $booking->status }}">
+                                    {{ ucfirst($booking->status) }}
+                                </span>
+                            </td>
 
                             @if (auth()->user()->role === 'mahasiswa')
                                 <td>
@@ -153,8 +138,8 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ auth()->user()->role === 'petugas' ? 6 : 5 }}">
-                                Belum ada pengajuan.
+                            <td colspan="{{ auth()->user()->role === 'petugas' ? 6 : 5 }}" style="text-align: center; padding: 24px;" class="muted">
+                                Belum ada pengajuan peminjaman ruang.
                             </td>
                         </tr>
                     @endforelse
