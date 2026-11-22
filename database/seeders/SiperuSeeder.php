@@ -52,10 +52,20 @@ class SiperuSeeder extends Seeder
             // Jenis fasilitas.
             $facilityIds = [];
 
-            foreach (['Proyektor', 'AC', 'Papan Tulis', 'Kursi'] as $name) {
-                $facility = Facility::firstOrCreate([
-                    'name' => $name,
-                ]);
+            $initialStocks = [
+                'Proyektor' => 2,
+                'AC' => 6,
+                'Papan Tulis' => 3,
+                'Kursi' => 130,
+            ];
+
+            $facilityIds = [];
+
+            foreach ($initialStocks as $name => $totalStock) {
+                $facility = Facility::firstOrCreate(
+                    ['name' => $name],
+                    ['total_stock' => $totalStock]
+                );
 
                 $facilityIds[$name] = $facility->id;
             }
@@ -122,6 +132,28 @@ class SiperuSeeder extends Seeder
                         $pivotData[$facilityIds[$name]] = [
                             'quantity' => $quantity,
                         ];
+                    }
+
+                   foreach ($pivotData as $facilityId => $pivot) {
+                        $facility = Facility::whereKey($facilityId)
+                            ->lockForUpdate()
+                            ->firstOrFail();
+
+                        $allocated = (int) DB::table('room_facilities')
+                            ->where('facility_id', $facilityId)
+                            ->lockForUpdate()
+                            ->get()
+                            ->sum('quantity');
+
+                        $requiredStock = $allocated + (int) $pivot['quantity'];
+
+                        if ((int) $facility->total_stock < $requiredStock) {
+                            throw new \RuntimeException(
+                                "Stok {$facility->name} tidak cukup untuk data contoh. "
+                                ."Diperlukan minimal {$requiredStock} unit. "
+                                ."Periksa stok melalui Kelola Fasilitas."
+                            );
+                        }
                     }
 
                     $room->facilities()->attach($pivotData);
